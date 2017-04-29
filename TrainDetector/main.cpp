@@ -70,6 +70,7 @@ int main() {
 	int fuggoleges_hatar;
 	vector<Rect> targets;
 	bool szunet = false;
+	//sdffadfasdfasdfasdf
 	int frame_count = 0;
 	while (1) {
 		if (!cap.isOpened()) {
