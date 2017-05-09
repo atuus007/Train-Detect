@@ -64,32 +64,51 @@ int main() {
 
 	VideoCapture cap;
 	//03128288.MP4 03128282.MP4 03128283.MP4
-	cap.open("03128288.MP4");
+	cap.open("d:\\Programok\\Projects\\Visual Studio\\cutted_videos\\03128288.MP4");
 	Point vonal[2];
 	Mat frame1, frame2, grey1, grey2, diff, threshold2;
+	Mat clone;
 	int fuggoleges_hatar;
 	vector<Rect> targets;
+	vector<Szamlalok> jelenlegikeretek;
+	vector<vector<Point> > konturok;
+	vector<vector<Point> > convexHulls(konturok.size());
 	bool szunet = false;
 	//sdffadfasdfasdfasdf
 	int frame_count = 0;
 	while (1) {
+		
 		if (!cap.isOpened()) {
 			cout << "error reading video file" << endl << endl;
 			getchar();
+			if (frame1.empty()|| frame2.empty()) {
+				return 0;
+			}
+			
 			return 0;
 
 		}
-		while (cap.get(CV_CAP_PROP_POS_FRAMES) <
-			cap.get(CV_CAP_PROP_FRAME_COUNT) - 1) {
-			vector<Szamlalok> jelenlegikeretek;
+		while (cap.get(CV_CAP_PROP_POS_FRAMES) < cap.get(CV_CAP_PROP_FRAME_COUNT) - 1) {
+			
 			cap.read(frame1);
 			cap.read(frame2);
-			if (frame1.empty()) {
+			if (frame1.empty()|| frame2.empty()) {
 				return 0;
 			}
-			if (frame2.empty()) {
-				return 0;
-			}
+			
+
+			
+			cvtColor(frame1, grey1, COLOR_BGR2GRAY);
+			cvtColor(frame2, grey2, COLOR_BGR2GRAY);
+			absdiff(grey1, grey2, diff);
+			
+
+
+
+
+			
+		
+		
 			fuggoleges_hatar = (int)round(frame1.cols*0.2);
 			vonal[0].x = fuggoleges_hatar;
 			vonal[0].y = 0;
@@ -97,21 +116,24 @@ int main() {
 			vonal[1].y = frame1.rows - 1;
 
 
-			cvtColor(frame1, grey1, COLOR_BGR2GRAY);
-			cvtColor(frame2, grey2, COLOR_BGR2GRAY);
+		
 
-			absdiff(grey1, grey2, diff);
+			adaptiveThreshold(diff,
+				threshold2, 255,
+				ADAPTIVE_THRESH_MEAN_C,
+				THRESH_BINARY_INV,
+				21,
+				10);
 			//elõször itt kell kisérletezni
-			threshold(diff, threshold2, 40, 245.0, CV_THRESH_BINARY);
+			//threshold(diff, threshold2, 40, 245.0, CV_THRESH_BINARY);
 			//resize(threshold2, threshold2, Size(threshold2.cols / 2, threshold2.rows / 2));
 			//namedWindow("Threshold_before blur", CV_WINDOW_AUTOSIZE);
 			//imshow("Threshold_before blur", threshold2);
 
 
 			GaussianBlur(threshold2, threshold2, Size(5, 5), 1.2);
-			vector<vector<Point> > konturok;
-			findContours(threshold2, konturok,
-				CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+			
+			findContours(threshold2, konturok, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
 
 			//imshow("Threshold_after_blur", threshold2);
 			vector<vector<Point> > convexHulls(konturok.size());
@@ -135,7 +157,7 @@ int main() {
 			namedWindow("Video", CV_WINDOW_AUTOSIZE);
 			imshow("Video", frameCopy);
 			char filename[128];
-			sprintf(filename, "frame_%06d.png", frame_count);
+			sprintf(filename, "d:\\mappa\\frame_%06d.png", frame_count);
 			cv::imwrite(filename, frameCopy);
 			frame_count++;
 
