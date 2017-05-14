@@ -47,19 +47,19 @@ public:
 	void nextPosition(void) {
 		int nmPoz = (int)centerPositions.size();
 		if (nmPoz == 1) {
-			//cout << nmPoz << endl;
+			cout <<"if (nmPoz == 1) : " <<nmPoz << endl;
 			pNextPos.x = centerPositions.back().x;
 			pNextPos.y = centerPositions.back().y;
 		}
 		else if (nmPoz == 2) {
-			//cout << nmPoz << endl;
+			cout << "if (nmPoz == 2): " << nmPoz << endl;
 			int deltaX = centerPositions[1].x - centerPositions[0].x;
 			int deltaY = centerPositions[1].y - centerPositions[0].y;
 			pNextPos.x = centerPositions.back().x + deltaX;
 			pNextPos.y = centerPositions.back().y + deltaY;
 		}
-		else if (nmPoz == 3) {
-			//cout << nmPoz << endl;
+		else if (nmPoz == 4) {
+			cout << "if (nmPoz == 4): " << nmPoz << endl;
 			int sumOfXChanges = ((centerPositions[2].x - centerPositions[1].x) * 2) +
 				((centerPositions[1].x - centerPositions[0].x) * 1);
 
@@ -74,7 +74,7 @@ public:
 			pNextPos.y = centerPositions.back().y + deltaY;
 		}
 		else if (nmPoz == 4) {
-			//cout << nmPoz << endl;
+			cout << "if (nmPoz == 4): " << nmPoz << endl;
 			int sumOfXChanges = ((centerPositions[3].x - centerPositions[2].x) * 3) +
 				((centerPositions[2].x - centerPositions[1].x) * 2) +
 				((centerPositions[1].x - centerPositions[0].x) * 1);
@@ -92,7 +92,7 @@ public:
 
 		}
 		else if (nmPoz >= 5) {
-			//cout << nmPoz << endl;
+			cout << "if (nmPoz >= 5): " << nmPoz << endl;
 			int sumOfXChanges = ((centerPositions[nmPoz - 1].x - centerPositions[nmPoz - 2].x) * 4) +
 				((centerPositions[nmPoz - 2].x - centerPositions[nmPoz - 3].x) * 3) +
 				((centerPositions[nmPoz - 3].x - centerPositions[nmPoz - 4].x) * 2) +
@@ -234,6 +234,23 @@ bool linechecker(vector<Szamlalok> &cargos, int &verticalBorder, int &cargoCount
 	}
 	return crossedALine;
 }
+void drawCount(int &cargo, Mat &img) {
+
+	int fontStyle = CV_FONT_HERSHEY_SIMPLEX;
+	double fontScale = (img.rows*img.cols) / 300000.0;
+	int thickness = (int)round(fontScale*1.5);
+
+	Size textSize = getTextSize(to_string(cargo), fontStyle,
+		fontScale, thickness, 0);
+	Point ptTextBottomLeftPosition;
+
+	ptTextBottomLeftPosition.x = img.cols - 1 - (int)((double)textSize.width * 1.25);
+	ptTextBottomLeftPosition.y = (int)((double)textSize.height * 1.25);
+
+	putText(img, to_string(cargo), ptTextBottomLeftPosition, fontStyle, fontScale, Scalar(0.0, 200.0, 0.0), thickness);
+
+
+}
 int main() {
 
 
@@ -342,7 +359,7 @@ int main() {
 			//cout << "green" << endl;
 			line(frameCopy, vonal[0], vonal[1], Scalar(0.0, 200.0, 0.0), 10);
 		}
-
+		drawCount(trainCount, frameCopy);
 
 		resize(frameCopy, frameCopy, Size(frameCopy.cols / 2, frameCopy.rows / 2));
 		namedWindow("Video", CV_WINDOW_AUTOSIZE);
