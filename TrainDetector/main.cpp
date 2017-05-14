@@ -17,8 +17,6 @@ public:
 	bool blnStillBeingTracked, blnCurrentMatchFoundOrNewBlob;
 	int egymastKoveto;
 
-
-
 	Szamlalok(vector<Point> kontur) {
 		Point kozeppont_jelenleg;
 		jelenlegiKontur = kontur;
@@ -35,10 +33,10 @@ public:
 	String toString() {
 		String s = "Atlo: " + to_string(atlo) +
 			" kep_meret: " + to_string(kep_meret) +
-			" JelenHat.x: " + to_string(jelenlegiHatarolo.x) +
-			" JelenHat.y: " + to_string(jelenlegiHatarolo.y) +
-			" x: " + to_string(pNextPos.x) +
-			" y: " + to_string(pNextPos.y) +
+			/*" JelenHat.x: " + to_string(jelenlegiHatarolo.x) +
+			" JelenHat.y: " + to_string(jelenlegiHatarolo.y) +*/
+			/*" x: " + to_string(pNextPos.x) +
+			" y: " + to_string(pNextPos.y) +*/
 			" width: " + to_string(jelenlegiHatarolo.width) +
 			" height: " + to_string(jelenlegiHatarolo.height);
 
@@ -47,19 +45,19 @@ public:
 	void nextPosition(void) {
 		int nmPoz = (int)centerPositions.size();
 		if (nmPoz == 1) {
-			cout <<"if (nmPoz == 1) : " <<nmPoz << endl;
+			//cout <<"if (nmPoz == 1) : " <<nmPoz << endl;
 			pNextPos.x = centerPositions.back().x;
 			pNextPos.y = centerPositions.back().y;
 		}
 		else if (nmPoz == 2) {
-			cout << "if (nmPoz == 2): " << nmPoz << endl;
+			//cout << "if (nmPoz == 2): " << nmPoz << endl;
 			int deltaX = centerPositions[1].x - centerPositions[0].x;
 			int deltaY = centerPositions[1].y - centerPositions[0].y;
 			pNextPos.x = centerPositions.back().x + deltaX;
 			pNextPos.y = centerPositions.back().y + deltaY;
 		}
 		else if (nmPoz == 4) {
-			cout << "if (nmPoz == 4): " << nmPoz << endl;
+			//cout << "if (nmPoz == 4): " << nmPoz << endl;
 			int sumOfXChanges = ((centerPositions[2].x - centerPositions[1].x) * 2) +
 				((centerPositions[1].x - centerPositions[0].x) * 1);
 
@@ -74,7 +72,7 @@ public:
 			pNextPos.y = centerPositions.back().y + deltaY;
 		}
 		else if (nmPoz == 4) {
-			cout << "if (nmPoz == 4): " << nmPoz << endl;
+			//cout << "if (nmPoz == 4): " << nmPoz << endl;
 			int sumOfXChanges = ((centerPositions[3].x - centerPositions[2].x) * 3) +
 				((centerPositions[2].x - centerPositions[1].x) * 2) +
 				((centerPositions[1].x - centerPositions[0].x) * 1);
@@ -92,7 +90,7 @@ public:
 
 		}
 		else if (nmPoz >= 5) {
-			cout << "if (nmPoz >= 5): " << nmPoz << endl;
+			//cout << "if (nmPoz >= 5): " << nmPoz << endl;
 			int sumOfXChanges = ((centerPositions[nmPoz - 1].x - centerPositions[nmPoz - 2].x) * 4) +
 				((centerPositions[nmPoz - 2].x - centerPositions[nmPoz - 3].x) * 3) +
 				((centerPositions[nmPoz - 3].x - centerPositions[nmPoz - 4].x) * 2) +
@@ -113,7 +111,7 @@ public:
 		}
 		else {
 			// should never get here
-			cout << "fasfdsadfasdfasdfasfda" << endl;
+			//cout << "fasfdsadfasdfasdfasfda" << endl;
 		}
 	}
 
@@ -134,7 +132,7 @@ double distanceCalc(Point pont1, Point pont2) {
 
 	return(sqrt(pow(intX, 2) + pow(intY, 2)));
 }
-void megjelol(vector<Szamlalok> &kocsik, Mat &frameCopy) {
+void showRect(vector<Szamlalok> &kocsik, Mat &frameCopy) {
 	for (int i = 0; i < kocsik.size(); i++) {
 		if (kocsik[i].blnStillBeingTracked == true) {
 			rectangle(frameCopy, kocsik[i].jelenlegiHatarolo, Scalar(144.0, 0.0, 255.0), 10);
@@ -224,10 +222,12 @@ bool linechecker(vector<Szamlalok> &cargos, int &verticalBorder, int &cargoCount
 			int currFrameIndex = (int)cargo.centerPositions.size() - 1;
 			//cout << cargo.centerPositions.size() << endl;
 			
-			 if(cargo.centerPositions[prevFrameIndex].x > verticalBorder
-			 && cargo.centerPositions[currFrameIndex].x <= verticalBorder) {
+			 if((cargo.centerPositions[prevFrameIndex].x > verticalBorder
+			 && cargo.centerPositions[currFrameIndex].x <= verticalBorder)|| 
+				 (cargo.centerPositions[prevFrameIndex].x < verticalBorder
+				 && cargo.centerPositions[currFrameIndex].x >= verticalBorder)) {
 				cargoCount++;
-				cout << cargoCount << " cargocount" << endl;
+				//cout << cargoCount << " cargocount" << endl;
 				crossedALine = true;
 			}
 		}
@@ -237,7 +237,7 @@ bool linechecker(vector<Szamlalok> &cargos, int &verticalBorder, int &cargoCount
 void drawCount(int &cargo, Mat &img) {
 
 	int fontStyle = CV_FONT_HERSHEY_SIMPLEX;
-	double fontScale = (img.rows*img.cols) / 300000.0;
+	double fontScale = (img.rows*img.cols) / 400000.0;
 	int thickness = (int)round(fontScale*1.5);
 
 	Size textSize = getTextSize(to_string(cargo), fontStyle,
@@ -251,11 +251,21 @@ void drawCount(int &cargo, Mat &img) {
 
 
 }
+void showFrame(string winName, Mat &frame, int div) {
+	resize(frame, frame, Size(frame.cols / div, frame.rows / div));
+	namedWindow(winName, CV_WINDOW_AUTOSIZE);
+	imshow(winName, frame);
+}
+void writeToDisk(string name, Mat frame, int frameCount) {
+	char filename[128];
+	sprintf(filename, "frame_%06d.png", frameCount);
+	imwrite(name, frame);
+}
 int main() {
 
 
 	VideoCapture cap;
-	//03128288.MP4 03128282.MP4 03128283.MP4
+	//03128288.MP4 03128282.MP4 03128283.MP4 vonat1.MP4
 	cap.open("d:\\Programok\\Projects\\Visual Studio\\cutted_videos\\vonat1.MP4");
 	Point vonal[2];
 
@@ -321,15 +331,18 @@ int main() {
 
 
 		findContours(threshold2, konturok, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+		//megjelenit("ConturWindow", threshold2, 2);
 		vector<vector<Point> > convexHulls(konturok.size());
 		for (int i = 0; i < konturok.size(); i++) {
 			convexHull(konturok[i], convexHulls[i]);
 		}
-
+		
+		
 		for (auto &konvextest : convexHulls) {
 			Szamlalok kocsi(konvextest);
-			if (kocsi.jelenlegiHatarolo.width >= 230 && /*kocsi.jelenlegiHatarolo.width <= 560 &&*/
-				kocsi.jelenlegiHatarolo.height >= 260 && /*kocsi.jelenlegiHatarolo.height <= 560&&*/
+			if (kocsi.jelenlegiHatarolo.width >= 60 && kocsi.jelenlegiHatarolo.width <= 500 &&
+				kocsi.jelenlegiHatarolo.height >= 230 &&
+				kocsi.kep_meret>=0.7 &&
 				kocsi.atlo > 250) {
 				jelenlegikeretek.push_back(kocsi);
 			}
@@ -346,9 +359,11 @@ int main() {
 
 		///////////////////////////////////////////////////////////////////////////////////////
 		frameCopy = frame2.clone();
-		megjelol(vegleges, frameCopy);
+		showRect(vegleges, frameCopy);
+		
 
 
+		
 		bool crossed = linechecker(vegleges, fuggoleges_hatar, trainCount);
 		
 		if (crossed == true) {
@@ -360,16 +375,12 @@ int main() {
 			line(frameCopy, vonal[0], vonal[1], Scalar(0.0, 200.0, 0.0), 10);
 		}
 		drawCount(trainCount, frameCopy);
+		showFrame("Final version", frameCopy, 2);
+		
+		frame_count++;
 
-		resize(frameCopy, frameCopy, Size(frameCopy.cols / 2, frameCopy.rows / 2));
-		namedWindow("Video", CV_WINDOW_AUTOSIZE);
-		imshow("Video", frameCopy);
-		//char filename[128];
-		//sprintf(filename, "frame_%06d.png", frame_count);
-		//imwrite(filename, frameCopy);
-///////////////////////////////////////////////////////////////////////////////////////
 		jelenlegikeretek.clear();
-		////////////////////////////////////////////////////////////////
+
 		frame1 = frame2.clone();
 		if ((cap.get(CV_CAP_PROP_POS_FRAMES) + 1) <
 			cap.get(CV_CAP_PROP_FRAME_COUNT)) {
@@ -380,7 +391,7 @@ int main() {
 			break;
 		}
 		elsoFrame = false;
-		///////////////////////////////////////////////////////////////////////////
+
 		switch (waitKey(1)) {
 		case 113: if (gaus > 0.0) { gaus = gaus - 0.1; } cout << "gaus-- " << gaus << endl; break;
 		case 119: gaus = gaus + 0.1; cout << "gaus++ " << gaus << endl; break;
